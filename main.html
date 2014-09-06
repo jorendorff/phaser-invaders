@@ -1,0 +1,38 @@
+<!doctype html>
+<script src="phaser.js"></script>
+
+
+<div id="phaser-example" style="width: 800px; margin-left: auto; margin-right: auto;"></div>
+
+
+<script>
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example',
+                           { preload: preload, create: create, update: update });
+
+function preload() {
+    game.load.image('slug', 'assets/foxslug.jpg');
+}
+
+var slug;
+
+function create() {
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
+    slug = game.add.sprite(game.world.centerX, game.world.centerY, 'slug');
+    slug.anchor.set(1/2);
+
+    game.physics.arcade.enable(slug);
+}
+
+function update() {
+    //  If the slug is > 8px away from the pointer then let's move to it
+    if (game.physics.arcade.distanceToPointer(slug, game.input.activePointer) > 8) {
+        //  Make the object seek to the active pointer (mouse or touch).
+        game.physics.arcade.moveToPointer(slug, 300);
+    } else {
+        //  Otherwise turn off velocity because we're close enough to the pointer
+        slug.body.velocity.set(0);
+    }
+}
+
+</script>

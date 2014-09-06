@@ -14,24 +14,60 @@ function preload() {
 }
 
 var slug;
+var badGuys = [];
+
+var blasts = [];
 
 function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
+    // Make the good guy
     slug = game.add.sprite(game.world.centerX, game.world.centerY, 'slug');
     slug.anchor.set(1/2);
-
     game.physics.arcade.enable(slug);
+
+    // Make 4 rows of bad guys
+    for (var row = 0; row < 4; row++) {
+        for (var col = 0; col < 7; col++) {
+            var guy = game.add.sprite(50 + 100 * col, 50 + row * 70, 'slug');
+            guy.anchor.set(1/2);
+            badGuys.push(guy);
+        }
+    }
+
 }
 
+var direction = +1;
+
 function update() {
-    //  If the slug is > 8px away from the pointer then let's move to it
-    if (game.physics.arcade.distanceToPointer(slug, game.input.activePointer) > 8) {
-        //  Make the object seek to the active pointer (mouse or touch).
-        game.physics.arcade.moveToPointer(slug, 300);
-    } else {
-        //  Otherwise turn off velocity because we're close enough to the pointer
-        slug.body.velocity.set(0);
+    // Move the slug.
+    slug.x = game.input.activePointer.x;
+    slug.y = 550;
+
+    // Shoot.
+    var newBlast = game.add.sprite(slug.x, slug.y, 'slug');
+    newBlast.anchor.set(1/2);
+    blasts.push(newBlast);
+
+    // Move all the laser blasts up.
+    for (var i = 0; i < blasts.length; i++) {
+        var b = blasts[i];
+        b.y -= 10;
+    }
+
+    // Move the badGuys
+    var touchingEdge = false;
+    for (var i = 0; i < badGuys.length; i++) {
+        var guy = badGuys[i];
+        guy.x = guy.x + direction;
+        if (guy.x > 800 || guy.x < 0) {
+            touchingEdge = true;
+        }
+    }
+
+    // Did we hit the edge?
+    if (touchingEdge) {
+        direction = -direction;
     }
 }
 
